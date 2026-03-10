@@ -24,8 +24,8 @@ You can also try failure paths:
 
 ```bash
 ./scripts/demo.sh 1.2.0 faulty_health
-./ci/run_ci.sh docker 1.2.0 faulty_signature
-./ci/run_ci.sh docker 1.2.0 faulty_checksum
+./scripts/demo.sh 1.2.0 faulty_signature
+./scripts/demo.sh 1.2.0 faulty_checksum
 ```
 
 - `faulty_health` shows rollback after a failed health check.
