@@ -1,0 +1,150 @@
+services:
+  dashboard:
+    build:
+      context: .
+      dockerfile: dashboard/Dockerfile
+    environment:
+      DASHBOARD_PERSIST_METRICS: "true"
+      DASHBOARD_DATA_DIR: /app/dashboard/data
+    volumes:
+      - ./dashboard/data:/app/dashboard/data
+    ports:
+      - "9000:9000"
+
+  gateway-1:
+    build:
+      context: .
+      dockerfile: gateway/Dockerfile
+    volumes:
+      - ./gateway/data-gw1:/app/gateway/data-gw1
+      - ./gateway/keys:/app/gateway/keys
+      - ./ci:/app/ci
+    environment:
+      GATEWAY_ID: gateway-1
+      GATEWAY_ONLINE: "${GW1_ONLINE:-true}"
+      GATEWAY_DATA_DIR: /app/gateway/data-gw1
+      DASHBOARD_METRICS_URL: http://dashboard:9000/metrics
+    ports:
+      - "8080:8080"
+    depends_on:
+      - dashboard
+
+  gateway-2:
+    build:
+      context: .
+      dockerfile: gateway/Dockerfile
+    volumes:
+      - ./gateway/data-gw2:/app/gateway/data-gw2
+      - ./gateway/keys:/app/gateway/keys
+      - ./ci:/app/ci
+    environment:
+      GATEWAY_ID: gateway-2
+      GATEWAY_ONLINE: "${GW2_ONLINE:-true}"
+      GATEWAY_DATA_DIR: /app/gateway/data-gw2
+      DASHBOARD_METRICS_URL: http://dashboard:9000/metrics
+    ports:
+      - "8081:8080"
+    depends_on:
+      - dashboard
+
+  robot-1:
+    build:
+      context: .
+      dockerfile: client/Dockerfile
+    environment:
+      ROBOT_ID: robot-1
+      GATEWAY_URL: http://gateway-1:8080
+      CLIENT_STATE_DIR: /app/client/state/robot-1
+      CHECK_INTERVAL: "30"
+    volumes:
+      - ./client/state/robot-1:/app/client/state/robot-1
+      - ./client/keys:/app/client/keys
+    depends_on:
+      - gateway-1
+
+  robot-2:
+    build:
+      context: .
+      dockerfile: client/Dockerfile
+    environment:
+      ROBOT_ID: robot-2
+      GATEWAY_URL: http://gateway-1:8080
+      CLIENT_STATE_DIR: /app/client/state/robot-2
+      CHECK_INTERVAL: "30"
+    volumes:
+      - ./client/state/robot-2:/app/client/state/robot-2
+      - ./client/keys:/app/client/keys
+    depends_on:
+      - gateway-1
+
+  robot-3:
+    build:
+      context: .
+      dockerfile: client/Dockerfile
+    environment:
+      ROBOT_ID: robot-3
+      GATEWAY_URL: http://gateway-1:8080
+      CLIENT_STATE_DIR: /app/client/state/robot-3
+      CHECK_INTERVAL: "30"
+    volumes:
+      - ./client/state/robot-3:/app/client/state/robot-3
+      - ./client/keys:/app/client/keys
+    depends_on:
+      - gateway-1
+
+  robot-4:
+    build:
+      context: .
+      dockerfile: client/Dockerfile
+    environment:
+      ROBOT_ID: robot-4
+      GATEWAY_URL: http://gateway-2:8080
+      CLIENT_STATE_DIR: /app/client/state/robot-4
+      CHECK_INTERVAL: "30"
+    volumes:
+      - ./client/state/robot-4:/app/client/state/robot-4
+      - ./client/keys:/app/client/keys
+    depends_on:
+      - gateway-2
+
+  robot-5:
+    build:
+      context: .
+      dockerfile: client/Dockerfile
+    environment:
+      ROBOT_ID: robot-5
+      GATEWAY_URL: http://gateway-2:8080
+      CLIENT_STATE_DIR: /app/client/state/robot-5
+      CHECK_INTERVAL: "30"
+    volumes:
+      - ./client/state/robot-5:/app/client/state/robot-5
+      - ./client/keys:/app/client/keys
+    depends_on:
+      - gateway-2
+
+  robot-6:
+    build:
+      context: .
+      dockerfile: client/Dockerfile
+    environment:
+      ROBOT_ID: robot-6
+      GATEWAY_URL: http://gateway-2:8080
+      CLIENT_STATE_DIR: /app/client/state/robot-6
+      CHECK_INTERVAL: "30"
+    volumes:
+      - ./client/state/robot-6:/app/client/state/robot-6
+      - ./client/keys:/app/client/keys
+    depends_on:
+      - gateway-2
+
+  ci:
+    build:
+      context: .
+      dockerfile: ci/Dockerfile
+    environment:
+      START_VERSION: 1.2.0
+      PUBLISH_INTERVAL: 30
+      SCENARIO_SEQUENCE: good,good,faulty_health
+      MAX_RELEASES: 5
+    volumes:
+      - ./:/app

@@ -1,0 +1,37 @@
+venv/
+__pycache__/
+*.pyc
+.env
+
+# Python / tooling
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# CI generated outputs
+ci/artifacts/
+ci/manifests/
+ci/sbom/
+ci/signatures/
+ci/keys/
+
+# Runtime keys copied for services
+gateway/keys/
+client/keys/
+
+# Runtime data/state
+gateway/data/
+gateway/data-gw1/
+gateway/data-gw2/
+dashboard/data/
+logs/
+client/state/robot-*/downloads/
+client/state/robot-*/installed/
+client/state/robot-*/backup/
+client/state/robot-*/current_version.json
+client/state/robot-*/previous_version.json
+
+# macOS
+.DS_Store
