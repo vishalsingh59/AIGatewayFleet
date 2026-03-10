@@ -32,7 +32,11 @@ def run():
         if update_info["update_available"]:
 
             print("Verifying manifest...")
-            verify_release(update_info["manifest"], GATEWAY_URL)
+            verify_release(
+                update_info["manifest"],
+                GATEWAY_URL,
+                manifest_bytes=update_info.get("manifest_bytes"),
+            )
 
             print("Downloading package...")
             package_path = download_package(

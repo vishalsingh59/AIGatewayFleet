@@ -14,6 +14,7 @@ htmlcov/
 ci/artifacts/
 ci/manifests/
 ci/sbom/
+ci/attestations/
 ci/signatures/
 ci/keys/
 
@@ -30,6 +31,7 @@ logs/
 client/state/robot-*/downloads/
 client/state/robot-*/installed/
 client/state/robot-*/backup/
+client/state/robot-*/version_state.json
 client/state/robot-*/current_version.json
 client/state/robot-*/previous_version.json
 

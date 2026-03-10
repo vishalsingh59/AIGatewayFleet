@@ -154,6 +154,7 @@ def check_for_update():
     response.raise_for_status()
 
     manifest = response.json()
+    manifest_bytes = response.content
     latest_version = manifest["version"]
     current_parsed = parse_version(current_version)
     latest_parsed = parse_version(latest_version)
@@ -185,11 +186,12 @@ def check_for_update():
         "update_available": update_available,
         "artifact_url": f"{GATEWAY_URL}{manifest['artifact_url']}",
         "manifest": manifest,
+        "manifest_bytes": manifest_bytes,
         "reason": reason,
     }
 
 
-def verify_release(manifest: dict, gateway_url: str):
+def verify_release(manifest: dict, gateway_url: str, manifest_bytes: Optional[bytes] = None):
     missing = REQUIRED_MANIFEST_FIELDS - manifest.keys()
     if missing:
         raise ValueError(f"Manifest missing required fields: {sorted(missing)}")
@@ -205,7 +207,7 @@ def verify_release(manifest: dict, gateway_url: str):
 
     if not signatures.get("manifest_signature"):
         raise ValueError(f"Manifest signature for version {version} not found")
-    manifest_bytes = canonical_json_bytes(manifest)
+    manifest_bytes = manifest_bytes or canonical_json_bytes(manifest)
     verify_signature_bytes(
         manifest_bytes,
         base64.b64decode(signatures["manifest_signature"]),

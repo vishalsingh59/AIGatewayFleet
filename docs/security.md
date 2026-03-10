@@ -1,12 +1,8 @@
 # Security Notes
 
-## What is protected
+## Signing approach
 
-The update flow is designed to prevent robots from installing tampered or untrusted software.
-
-## Signing
-
-The current implementation signs release files with RSA keys using `openssl`.
+Release metadata and payloads are signed in CI with an RSA keypair generated locally by `ci/scripts/sign_artifact.sh`.
 
 Signed files:
 
@@ -15,32 +11,39 @@ Signed files:
 - attestation
 - manifest
 
-## Verification
+The private key is generated on demand and is intentionally ignored by git. Only the public key is copied to the gateway and robot trust stores during release publication.
 
-Both gateway and client verify files with local public keys.
+## Offline verification
 
-This happens offline, so robots do not need internet access to validate updates.
+All trust decisions work without internet access:
 
-## Integrity checks
+- the gateway verifies manifest, artifact, SBOM, attestation, and all signatures before caching a release
+- the robot verifies the manifest signature, SBOM signature, attestation signature, attestation contents, artifact checksum, and artifact signature before install
+- downgrade attempts are blocked by storing the highest accepted version on each robot
 
-The manifest includes checksums.
+## Threat model
 
-Gateway and client verify checksums before accepting files.
+Threats addressed by the prototype:
 
-## Threats considered
+- tampered artifact, SBOM, attestation, or manifest in transit or at rest
+- compromised or buggy gateway trying to serve modified release content
+- replay or downgrade attempts from stale cached manifests
+- intermittent network failures between robot, gateway, and dashboard
 
-- malicious artifact injection
-- file tampering in transit or at rest
-- compromised gateway serving bad files
-- replay/downgrade attempts
+Threats not fully addressed in this prototype:
+
+- compromise of the CI signing environment
+- theft of a robot or gateway trust store from the host filesystem
+- insider misuse of local shell access on the demo machine
+- transport-layer interception between components; mTLS is left as a documented future enhancement
 
 ## Key rotation plan
 
-1. publish new public key in signed metadata
-2. distribute keys through gateway sync
-3. update trusted keys on robots
-4. deprecate old key after migration
+1. Generate a new signing keypair in CI.
+2. Publish the new public key alongside the current one in a signed release.
+3. Sync both trusted public keys to gateways.
+4. Let robots accept signatures from either key during the transition window.
+5. Start signing new releases with the new private key.
+6. Publish one final dual-trust release that removes the old key from the trusted set.
 
-## Future options
-
-If needed later, you can switch signing backend to tools like Cosign, GPG, or in-toto.
+This prototype does not automate multi-key trust sets yet, but the rollout sequence above is the intended production path.

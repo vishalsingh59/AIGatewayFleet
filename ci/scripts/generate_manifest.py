@@ -1,7 +1,8 @@
 import json
 import sys
 from pathlib import Path
-from shared.security import sha256_file
+
+from shared.security import canonical_json_bytes, sha256_file
 
 version = sys.argv[1] if len(sys.argv) > 1 else "1.0.0"
 
@@ -37,8 +38,6 @@ manifest = {
 }
 
 manifest_path = output_dir / f"manifest-{version}.json"
-
-with open(manifest_path, "w", encoding="utf-8") as f:
-    json.dump(manifest, f, indent=2)
+manifest_path.write_bytes(canonical_json_bytes(manifest))
 
 print(f"Manifest created: {manifest_path}")

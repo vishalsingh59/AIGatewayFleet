@@ -27,15 +27,11 @@ reset_robot_state() {
   mkdir -p "${robot_state_dir}/installed"
   mkdir -p "${robot_state_dir}/backup"
 
-  cat > "${robot_state_dir}/current_version.json" <<EOF
+  cat > "${robot_state_dir}/version_state.json" <<EOF
 {
-  "version": "1.0.0"
-}
-EOF
-
-  cat > "${robot_state_dir}/previous_version.json" <<EOF
-{
-  "version": "1.0.0"
+  "current_version": "1.0.0",
+  "previous_version": "1.0.0",
+  "highest_version": "1.0.0"
 }
 EOF
 

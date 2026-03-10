@@ -7,7 +7,32 @@ cd "${ROOT_DIR}"
 VERSION="${1:-1.1.0}"
 MODE="${2:-good}"
 LOG_ROOT="${ROOT_DIR}/logs/demo"
-RUN_ID="$(date -u +%Y%m%dT%H%M%SZ)"
+
+next_run_id() {
+  local max_index=0
+  local entry name suffix numeric
+
+  mkdir -p "${LOG_ROOT}"
+
+  for entry in "${LOG_ROOT}"/*; do
+    if [ ! -d "${entry}" ]; then
+      continue
+    fi
+
+    name="$(basename "${entry}")"
+    suffix="${name##*_}"
+    if [[ "${name}" == timestamp_* && "${suffix}" =~ ^[0-9]+$ ]]; then
+      numeric=$((10#${suffix}))
+      if [ "${numeric}" -gt "${max_index}" ]; then
+        max_index="${numeric}"
+      fi
+    fi
+  done
+
+  printf "timestamp_%02d" "$((max_index + 1))"
+}
+
+RUN_ID="$(next_run_id)"
 RUN_LOG_DIR="${LOG_ROOT}/${RUN_ID}"
 RUN_LOG_FILE="${RUN_LOG_DIR}/demo.log"
 
@@ -16,7 +41,6 @@ GW1_URL="http://127.0.0.1:8080"
 GW2_URL="http://127.0.0.1:8081"
 
 prepare_logs() {
-  rm -rf "${LOG_ROOT}"
   mkdir -p "${RUN_LOG_DIR}"
   exec > >(tee -a "${RUN_LOG_FILE}") 2>&1
 }

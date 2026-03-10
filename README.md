@@ -41,7 +41,7 @@ This is the recommended command for the full assignment flow (2 gateways, 6 robo
 ./scripts/demo.sh 1.2.0 good
 ```
 
-`demo.sh` writes logs to `logs/demo/<utc-timestamp>/` and clears old demo logs at the start of each run.
+`demo.sh` writes logs to `logs/demo/timestamp_01/`, `timestamp_02/`, and so on, keeping prior runs for comparison.
 
 ## Run Services Manually
 
@@ -73,6 +73,8 @@ source venv/bin/activate
 python3 -m pytest -q
 ```
 
+The tests cover manifest signature verification, rollback, and gateway buffer recovery after network failure.
+
 ## Periodic CI Publisher
 
 ```bash
@@ -100,3 +102,4 @@ docker compose up --build
 
 - Delta patching is not implemented (resumable download is implemented).
 - Gateway sync and forwarding are API-triggered (`/sync`, `/forward`) by default.
+- Transport security between services is not implemented; the optional mTLS bonus is intentionally out of scope.

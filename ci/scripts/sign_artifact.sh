@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -e
+umask 077
 
 VERSION="${1:-1.0.0}"
 OUTPUT_DIR="ci/signatures"
