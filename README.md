@@ -20,6 +20,15 @@ Proof-of-concept for offline robot updates and fleet metrics aggregation.
 
 Demo logs are written to `logs/demo/timestamp_01/`, `timestamp_02/`, and so on.
 
+You can also try failure paths:
+
+```bash
+./scripts/demo.sh 1.2.0 faulty_health
+```
+
+- `faulty_health` shows rollback after a failed health check.
+- `faulty_signature` and `faulty_checksum` show release rejection during verification.
+
 ## Run Tests
 
 ```bash
